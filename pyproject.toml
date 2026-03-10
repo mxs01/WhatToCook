@@ -1,0 +1,61 @@
+# =============================================================================
+# WhatToCook — Workspace-level tooling configuration
+# =============================================================================
+# This file configures ruff and pytest for the entire monorepo.
+# Individual sub-projects (backend/, flux-worker/) keep their own
+# pyproject.toml for build/dependency definitions, but inherit these
+# tool settings when run from the repo root.
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["backend/src", "flux-worker/src", "backend/tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff-specific rules
+    "T20",  # flake8-print (catch stray print statements)
+    "PT",   # flake8-pytest-style
+    "RET",  # flake8-return
+    "PIE",  # flake8-pie (misc. lints)
+]
+ignore = [
+    "E501",   # line length — already enforced by line-length setting
+    "B008",   # Depends() in argument defaults — standard FastAPI DI pattern
+    "RET504", # unnecessary assignment before return — often clearer in try/except
+    "RUF012", # mutable class variable — false positives with SQLAlchemy models
+    "T201",   # allow print() in scripts (setup.sh helpers, seed, etc.)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["whattocook", "flux_worker"]
+
+[tool.ruff.lint.per-file-ignores]
+"backend/alembic/**" = ["UP", "RUF"]       # auto-generated migration code
+"backend/tests/**"   = ["T20"]              # prints ok in tests
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+pythonpath = ["backend/src"]
+asyncio_mode = "auto"
+addopts = [
+    "-ra",            # show summary of all non-passing tests
+    "--strict-markers",
+    "--tb=short",
+    "-q",
+]
+markers = [
+    "slow: marks tests that hit real infrastructure (deselect with '-m \"not slow\"')",
+    "integration: integration tests requiring database/redis",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:passlib.*",
+    "ignore::DeprecationWarning:pkg_resources.*",
+]

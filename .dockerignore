@@ -1,0 +1,37 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[codz]
+*.egg-info
+.venv
+.mypy_cache
+.ruff_cache
+.pytest_cache
+htmlcov
+.coverage
+
+# Node
+frontend/node_modules
+frontend/dist
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+.cursor*
+
+# Docker volumes (not in repo, but just in case)
+pgdata
+redisdata
+miniodata
+
+# Docs
+*.md
+LICENSE
