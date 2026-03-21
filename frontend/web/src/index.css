@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #f9f9f9;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-primary: #061b0e;
+  --color-primary-container: #1b3022;
+  --color-surface: #f9f9f9;
+  --color-surface-container: #eeeeee;
+  --color-surface-container-high: #e8e8e8;
+  --color-surface-container-highest: #e2e2e2;
+  --color-surface-container-low: #f3f3f3;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface: #1a1c1c;
+  --color-outline-variant: #c3c8c1;
+  --color-secondary: #5f5e5e;
+
+  --font-sans: "Manrope", sans-serif;
+  --font-serif: "Noto Serif", serif;
+
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism utility */
+@utility glass {
+  background-color: rgba(249, 249, 249, 0.7);
+  backdrop-filter: blur(20px);
+}
+
+/* Primary overlay gradient */
+@utility primary-gradient {
+  background: linear-gradient(45deg, var(--color-primary), var(--color-primary-container));
+  color: white;
+}
+
+/* Image overlay gradient */
+@utility card-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+}
