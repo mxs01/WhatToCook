@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
 
+import Footer from './components/Footer';
+
 // Pages
 import Home from './pages/Home';
 import LoginScreen from './pages/LoginScreen';
@@ -13,9 +15,9 @@ import AccountSettings from './pages/AccountSettings';
 function App() {
   return (
     <BrowserRouter>
-      <div className="antialiased selection:bg-primary/20 selection:text-primary scroll-smooth min-h-screen flex flex-col">
+      <div className="antialiased selection:bg-primary/20 selection:text-primary scroll-smooth min-h-[100dvh] flex flex-col">
         <Navigation />
-        <main className="flex-1">
+        <main className="flex-1 w-full relative">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginScreen />} />
@@ -26,6 +28,7 @@ function App() {
             <Route path="/settings" element={<AccountSettings />} />
           </Routes>
         </main>
+        <Footer />
       </div>
     </BrowserRouter>
   );
