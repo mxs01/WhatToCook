@@ -1,4 +1,14 @@
+import { useState } from 'react';
+import NotificationPreferencesModal from '../components/NotificationPreferencesModal';
+import PrivacySettingsModal from '../components/PrivacySettingsModal';
+import CookingLevelModal from '../components/CookingLevelModal';
+import ManagePlanModal from '../components/ManagePlanModal';
+
 export default function AccountSettings() {
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isCookingLevelModalOpen, setIsCookingLevelModalOpen] = useState(false);
+  const [isManagePlanModalOpen, setIsManagePlanModalOpen] = useState(false);
 
   return (
     <div className="space-y-16 w-full">
@@ -18,7 +28,7 @@ export default function AccountSettings() {
                   <span>Next renewal July 2024</span>
                 </div>
               </div>
-              <button className="relative z-10 px-8 py-4 bg-white text-stone-900 font-extrabold font-sans tracking-wide rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg hover:shadow-xl">
+              <button onClick={() => setIsManagePlanModalOpen(true)} className="relative z-10 px-8 py-4 bg-white text-stone-900 font-extrabold font-sans tracking-wide rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg hover:shadow-xl">
                 Manage Plan
               </button>
             </div>
@@ -33,7 +43,7 @@ export default function AccountSettings() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               
               {/* Card 1 */}
-              <div className="group p-8 bg-surface-container-lowest rounded-lg hover:shadow-xl hover:shadow-surface-container-highest/50 transition-all duration-500 border border-outline-variant/20 cursor-pointer">
+              <div onClick={() => setIsNotificationModalOpen(true)} className="group p-8 bg-surface-container-lowest rounded-lg hover:shadow-xl hover:shadow-surface-container-highest/50 transition-all duration-500 border border-outline-variant/20 cursor-pointer">
                 <div className="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center mb-6 group-hover:bg-primary-fixed transition-colors">
                   <span className="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">notifications</span>
                 </div>
@@ -44,7 +54,7 @@ export default function AccountSettings() {
               </div>
 
               {/* Card 2 */}
-              <div className="group p-8 bg-surface-container-lowest rounded-lg hover:shadow-xl hover:shadow-surface-container-highest/50 transition-all duration-500 border border-outline-variant/20 cursor-pointer">
+              <div onClick={() => setIsPrivacyModalOpen(true)} className="group p-8 bg-surface-container-lowest rounded-lg hover:shadow-xl hover:shadow-surface-container-highest/50 transition-all duration-500 border border-outline-variant/20 cursor-pointer">
                 <div className="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center mb-6 group-hover:bg-primary-fixed transition-colors">
                   <span className="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">shield</span>
                 </div>
@@ -55,7 +65,7 @@ export default function AccountSettings() {
               </div>
 
               {/* Card 3 */}
-              <div className="group p-8 bg-surface-container-lowest rounded-lg hover:shadow-xl hover:shadow-surface-container-highest/50 transition-all duration-500 border border-outline-variant/20 cursor-pointer">
+              <div onClick={() => setIsCookingLevelModalOpen(true)} className="group p-8 bg-surface-container-lowest rounded-lg hover:shadow-xl hover:shadow-surface-container-highest/50 transition-all duration-500 border border-outline-variant/20 cursor-pointer">
                 <div className="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center mb-6 group-hover:bg-primary-fixed transition-colors">
                   <span className="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">restaurant</span>
                 </div>
@@ -117,6 +127,22 @@ export default function AccountSettings() {
             </div>
           </section>
 
+      <NotificationPreferencesModal 
+        isOpen={isNotificationModalOpen} 
+        onClose={() => setIsNotificationModalOpen(false)} 
+      />
+      <PrivacySettingsModal 
+        isOpen={isPrivacyModalOpen} 
+        onClose={() => setIsPrivacyModalOpen(false)} 
+      />
+      <CookingLevelModal 
+        isOpen={isCookingLevelModalOpen} 
+        onClose={() => setIsCookingLevelModalOpen(false)} 
+      />
+      <ManagePlanModal 
+        isOpen={isManagePlanModalOpen} 
+        onClose={() => setIsManagePlanModalOpen(false)} 
+      />
     </div>
   );
 }

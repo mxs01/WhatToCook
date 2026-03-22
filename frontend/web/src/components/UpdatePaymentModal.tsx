@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import CardNumberInput from './CardNumberInput';
 import ExpiryDateDropdown from './ExpiryDateDropdown';
 
@@ -7,10 +8,16 @@ interface UpdatePaymentModalProps {
 }
 
 export default function UpdatePaymentModal({ isOpen, onClose }: UpdatePaymentModalProps) {
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center">
+    <div className="fixed inset-0 z-[60] h-[100vh] overflow-hidden flex items-center justify-center">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-stone-950/60 backdrop-blur-md cursor-pointer"
