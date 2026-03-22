@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -18,7 +18,7 @@ class RecipeRepository:
     async def create(
         self,
         user_id: uuid.UUID,
-        upload_id: uuid.UUID,
+        upload_id: uuid.UUID | None,
         title: str,
         description: str,
         ingredients_json: list,
@@ -28,6 +28,11 @@ class RecipeRepository:
         servings: int = 2,
         cuisine: str = "",
         difficulty: str = "medium",
+        calories: float | None = None,
+        protein: float | None = None,
+        carbs: float | None = None,
+        fat: float | None = None,
+        tags_json: list | None = None,
     ) -> Recipe:
         recipe = Recipe(
             user_id=user_id,
@@ -41,6 +46,11 @@ class RecipeRepository:
             servings=servings,
             cuisine=cuisine,
             difficulty=difficulty,
+            calories=calories,
+            protein=protein,
+            carbs=carbs,
+            fat=fat,
+            tags_json=tags_json or [],
         )
         self.session.add(recipe)
         await self.session.flush()
@@ -59,18 +69,52 @@ class RecipeRepository:
         return result.scalar_one_or_none()
 
     async def list_by_user(
-        self, user_id: uuid.UUID, limit: int = 20, offset: int = 0
+        self,
+        user_id: uuid.UUID,
+        limit: int = 20,
+        offset: int = 0,
+        search: str | None = None,
+        cuisine: str | None = None,
+        tags: list[str] | None = None,
     ) -> list[Recipe]:
+        stmt = select(Recipe).where(Recipe.user_id == user_id)
+
+        if search:
+            like = f"%{search.lower()}%"
+            stmt = stmt.where(
+                or_(
+                    Recipe.title.ilike(like),
+                    Recipe.description.ilike(like),
+                )
+            )
+
+        if cuisine:
+            stmt = stmt.where(Recipe.cuisine.ilike(cuisine))
+
+        if tags:
+            for tag in tags:
+                stmt = stmt.where(Recipe.tags_json.contains([tag]))
+
         stmt = (
-            select(Recipe)
-            .where(Recipe.user_id == user_id)
-            .options(selectinload(Recipe.images))
+            stmt.options(selectinload(Recipe.images))
             .order_by(Recipe.created_at.desc())
             .limit(limit)
             .offset(offset)
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_nutrition_by_id(
+        self, recipe_id: uuid.UUID
+    ) -> tuple[float | None, float | None, float | None, float | None] | None:
+        stmt = select(Recipe.calories, Recipe.protein, Recipe.carbs, Recipe.fat).where(
+            Recipe.id == recipe_id
+        )
+        result = await self.session.execute(stmt)
+        row = result.one_or_none()
+        if row is None:
+            return None
+        return (row[0], row[1], row[2], row[3])
 
     async def add_reference(
         self,

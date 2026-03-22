@@ -56,12 +56,14 @@ class MockLLM(LLMPort):
         temperature: float = 0.7,
         max_tokens: int = 4096,
     ) -> T:
-        self.generate_calls.append({
-            "prompt": prompt,
-            "output_schema": output_schema,
-            "system_prompt": system_prompt,
-            "temperature": temperature,
-        })
+        self.generate_calls.append(
+            {
+                "prompt": prompt,
+                "output_schema": output_schema,
+                "system_prompt": system_prompt,
+                "temperature": temperature,
+            }
+        )
         if self._generate_response is not None:
             return self._generate_response  # type: ignore[return-value]
         # Build a default from the schema
@@ -77,11 +79,13 @@ class MockLLM(LLMPort):
         temperature: float = 0.3,
         max_tokens: int = 4096,
     ) -> T:
-        self.analyze_image_calls.append({
-            "image_bytes_len": len(image_bytes),
-            "prompt": prompt,
-            "output_schema": output_schema,
-        })
+        self.analyze_image_calls.append(
+            {
+                "image_bytes_len": len(image_bytes),
+                "prompt": prompt,
+                "output_schema": output_schema,
+            }
+        )
         if self._analyze_image_response is not None:
             return self._analyze_image_response  # type: ignore[return-value]
         return output_schema.model_validate(output_schema.model_json_schema())  # type: ignore[return-value]
@@ -150,7 +154,9 @@ class MockObjectStorage(ObjectStoragePort):
     def __init__(self) -> None:
         self.objects: dict[str, bytes] = {}
 
-    async def upload(self, key: str, data: bytes, content_type: str = "application/octet-stream") -> str:
+    async def upload(
+        self, key: str, data: bytes, content_type: str = "application/octet-stream"
+    ) -> str:
         self.objects[key] = data
         return key
 
@@ -209,14 +215,19 @@ class MockJobQueue(JobQueuePort):
             return job
         return None
 
-    async def complete(self, job_id: str) -> None:
+    async def complete(self, job_id: str, result: dict[str, Any] | None = None) -> None:
         if job_id in self.jobs:
             self.jobs[job_id]["status"] = "completed"
+            if result is not None:
+                self.jobs[job_id]["result"] = result
 
     async def fail(self, job_id: str, error: str) -> None:
         if job_id in self.jobs:
             self.jobs[job_id]["status"] = "failed"
             self.jobs[job_id]["error"] = error
+
+    async def get_job_status(self, job_id: str) -> dict[str, Any] | None:
+        return self.jobs.get(job_id)
 
 
 # ─── Pytest Fixtures ─────────────────────────────────────────────────────────
@@ -244,15 +255,17 @@ def mock_storage() -> MockObjectStorage:
 
 @pytest.fixture
 def mock_vector_search() -> MockVectorSearch:
-    return MockVectorSearch(results=[
-        ChunkResult(
-            chunk_id=str(CHUNK_ID),
-            document_id=str(DOC_ID),
-            text="A classic pasta dish with tomato sauce, garlic, and basil.",
-            score=0.85,
-            metadata={"recipe_title": "Classic Pasta"},
-        ),
-    ])
+    return MockVectorSearch(
+        results=[
+            ChunkResult(
+                chunk_id=str(CHUNK_ID),
+                document_id=str(DOC_ID),
+                text="A classic pasta dish with tomato sauce, garlic, and basil.",
+                score=0.85,
+                metadata={"recipe_title": "Classic Pasta"},
+            ),
+        ]
+    )
 
 
 @pytest.fixture
@@ -264,9 +277,13 @@ def mock_job_queue() -> MockJobQueue:
 def sample_ingredients() -> list[IngredientDetection]:
     return [
         IngredientDetection(name="tomatoes", normalized_name="tomatoes", confidence=0.95),
-        IngredientDetection(name="mozzarella", normalized_name="mozzarella cheese", confidence=0.88),
+        IngredientDetection(
+            name="mozzarella", normalized_name="mozzarella cheese", confidence=0.88
+        ),
         IngredientDetection(name="basil leaves", normalized_name="basil", confidence=0.92),
-        IngredientDetection(name="chicken breast", normalized_name="chicken breast", confidence=0.90),
+        IngredientDetection(
+            name="chicken breast", normalized_name="chicken breast", confidence=0.90
+        ),
     ]
 
 

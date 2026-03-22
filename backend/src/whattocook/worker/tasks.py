@@ -13,6 +13,7 @@ from whattocook.dependencies import (
     get_llm,
     get_object_storage,
 )
+from whattocook.worker.text_generation import generate_recipe_from_text
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,32 @@ async def process_fridge_upload(payload: dict) -> None:
         await graph.ainvoke(initial_state)
 
 
+async def process_text_recipe_generation(payload: dict) -> str:
+    """Process text-to-recipe generation job."""
+    settings = get_settings()
+    user_id = payload["user_id"]
+    prompt = payload["prompt"]
+    preferences = payload.get("preferences", {})
+
+    llm = get_llm(settings)
+    embedding = get_embedding(settings)
+
+    async with async_session_factory() as session:
+        from whattocook.adapters.vector_search.pgvector import PgVectorAdapter
+
+        vector_search = PgVectorAdapter(session)
+        return await generate_recipe_from_text(
+            user_id=user_id,
+            prompt=prompt,
+            preferences=preferences,
+            session=session,
+            llm=llm,
+            embedding=embedding,
+            vector_search=vector_search,
+        )
+
+
 JOB_HANDLERS = {
     "process_fridge_upload": process_fridge_upload,
+    "process_text_recipe_generation": process_text_recipe_generation,
 }

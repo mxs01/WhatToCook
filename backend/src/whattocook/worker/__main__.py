@@ -42,8 +42,11 @@ async def run_worker() -> None:
                 continue
 
             try:
-                await handler(payload)
-                await queue.complete(job_id)
+                result = await handler(payload)
+                if isinstance(result, str):
+                    await queue.complete(job_id, result={"recipe_id": result})
+                else:
+                    await queue.complete(job_id)
                 logger.info(f"Job {job_id} completed successfully")
             except Exception as e:
                 logger.exception(f"Job {job_id} failed: {e}")

@@ -81,6 +81,7 @@ class RecipeResponse(BaseModel):
     servings: int
     created_at: datetime
     image_url: str | None = None
+    tags: list[str] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 
@@ -99,6 +100,8 @@ class RecipeDetailResponse(BaseModel):
     created_at: datetime
     references: list[ReferenceResponse]
     images: list[RecipeImageResponse]
+    nutrition: NutritionResponse
+    tags: list[str] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 
@@ -118,12 +121,36 @@ class RecipeImageResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class NutritionResponse(BaseModel):
+    calories: float | None = None
+    protein: float | None = None
+    carbs: float | None = None
+    fat: float | None = None
+
+
+class GenerateRecipeRequest(BaseModel):
+    prompt: str = Field(min_length=1, max_length=4000)
+    preferences: dict = Field(default_factory=dict)
+
+
+class UserPreferencesResponse(BaseModel):
+    preferences: dict = Field(default_factory=dict)
+
+
+class UpdateUserPreferencesRequest(BaseModel):
+    preferences: dict = Field(default_factory=dict)
+
+
+class JobResultResponse(BaseModel):
+    recipe_id: str | None = None
+
+
 # ─── Jobs ────────────────────────────────────────────────────────────────────
 
 
 class JobResponse(BaseModel):
     job_id: str
-    upload_id: str
+    upload_id: str | None = None
     status: str
 
 
@@ -134,3 +161,4 @@ class JobStatusResponse(BaseModel):
     started_at: str | None = None
     completed_at: str | None = None
     error: str | None = None
+    result: JobResultResponse | None = None

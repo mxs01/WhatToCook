@@ -35,11 +35,12 @@ class JobQueuePort(ABC):
         ...
 
     @abstractmethod
-    async def complete(self, job_id: str) -> None:
+    async def complete(self, job_id: str, result: dict[str, Any] | None = None) -> None:
         """Mark a job as completed.
 
         Args:
             job_id: The ID of the job to mark as completed.
+            result: Optional result payload for clients to fetch when done.
         """
         ...
 
@@ -51,4 +52,9 @@ class JobQueuePort(ABC):
             job_id: The ID of the job to mark as failed.
             error: Error message describing the failure.
         """
+        ...
+
+    @abstractmethod
+    async def get_job_status(self, job_id: str) -> dict[str, Any] | None:
+        """Get the current status metadata for a job."""
         ...

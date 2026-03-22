@@ -48,9 +48,11 @@ def auth_token(settings: MagicMock) -> str:
 @pytest.fixture
 def client(settings: MagicMock) -> TestClient:
     """Create a TestClient with mocked DB session and dependencies."""
-    with patch("whattocook.main.get_settings", return_value=settings), \
-         patch("whattocook.db.session.get_settings", return_value=settings), \
-         patch("whattocook.main.engine"):
+    with (
+        patch("whattocook.main.get_settings", return_value=settings),
+        patch("whattocook.db.session.get_settings", return_value=settings),
+        patch("whattocook.main.engine"),
+    ):
         app = create_app()
 
     return TestClient(app, raise_server_exceptions=False)
@@ -77,8 +79,10 @@ class TestAuthEndpoints:
         mock_user.display_name = "Test User"
         mock_user.created_at = "2025-01-01T00:00:00"
 
-        with patch("whattocook.api.users.UserRepository") as MockRepo, \
-             patch("whattocook.api.users.get_session") as mock_get_session:
+        with (
+            patch("whattocook.api.users.UserRepository") as MockRepo,
+            patch("whattocook.api.users.get_session") as mock_get_session,
+        ):
             # Override the get_session dependency
             mock_session = AsyncMock()
             mock_session.commit = AsyncMock()
@@ -88,6 +92,7 @@ class TestAuthEndpoints:
 
             app = client.app
             from whattocook.db.session import get_session
+
             app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
 
             repo_instance = MockRepo.return_value
@@ -121,6 +126,7 @@ class TestAuthEndpoints:
 
             app = client.app
             from whattocook.db.session import get_session
+
             app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
 
             repo_instance = MockRepo.return_value
@@ -161,6 +167,7 @@ class TestAuthEndpoints:
             app = client.app
             from whattocook.db.session import get_session
             from whattocook.config import get_settings as config_get_settings
+
             app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
             app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
 
@@ -199,6 +206,7 @@ class TestAuthEndpoints:
             app = client.app
             from whattocook.db.session import get_session
             from whattocook.config import get_settings as config_get_settings
+
             app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
             app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
 
@@ -383,9 +391,7 @@ class TestRecipeEndpoints:
         app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
 
         with patch("whattocook.api.recipes.RecipeRepository") as MockRecipeRepo:
-            MockRecipeRepo.return_value.list_by_user = AsyncMock(
-                return_value=[mock_recipe]
-            )
+            MockRecipeRepo.return_value.list_by_user = AsyncMock(return_value=[mock_recipe])
 
             response = client.get(
                 "/api/recipes",
@@ -430,6 +436,229 @@ class TestRecipeEndpoints:
         app.dependency_overrides.clear()  # type: ignore[union-attr]
 
         assert response.status_code == 404
+
+
+class TestRecipeGenerationEndpoints:
+    def test_generate_recipe_from_text_enqueues_job(
+        self,
+        client: TestClient,
+        auth_token: str,
+        settings: MagicMock,
+    ) -> None:
+        app = client.app
+        from whattocook.config import get_settings as config_get_settings
+        from whattocook.dependencies import get_job_queue
+
+        mock_queue = MockJobQueue()
+        app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
+        app.dependency_overrides[get_job_queue] = lambda: mock_queue  # type: ignore[union-attr]
+
+        response = client.post(
+            "/api/recipes/generate",
+            json={"prompt": "High-protein dinner", "preferences": {"diet": "high-protein"}},
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+
+        app.dependency_overrides.clear()  # type: ignore[union-attr]
+
+        assert response.status_code == 202
+        data = response.json()
+        assert data["status"] == "pending"
+        assert data["upload_id"] is None
+        assert len(mock_queue.jobs) == 1
+
+    def test_generate_recipe_requires_auth(self, client: TestClient) -> None:
+        response = client.post(
+            "/api/recipes/generate",
+            json={"prompt": "Simple pasta", "preferences": {}},
+        )
+        assert response.status_code == 401
+
+
+class TestJobsEndpoints:
+    def test_get_job_status_returns_payload(
+        self,
+        client: TestClient,
+        auth_token: str,
+        settings: MagicMock,
+    ) -> None:
+        app = client.app
+        from whattocook.config import get_settings as config_get_settings
+        from whattocook.dependencies import get_job_queue
+
+        mock_queue = MockJobQueue()
+        app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
+        app.dependency_overrides[get_job_queue] = lambda: mock_queue  # type: ignore[union-attr]
+
+        job_id = "job-123"
+        mock_queue.jobs[job_id] = {
+            "job_id": job_id,
+            "status": "completed",
+            "payload": {"user_id": str(USER_ID)},
+            "result": {"recipe_id": str(RECIPE_ID)},
+        }
+
+        response = client.get(
+            f"/api/jobs/{job_id}",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+
+        app.dependency_overrides.clear()  # type: ignore[union-attr]
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["job_id"] == job_id
+        assert data["status"] == "completed"
+        assert data["result"]["recipe_id"] == str(RECIPE_ID)
+
+    def test_get_job_status_for_other_user_returns_404(
+        self,
+        client: TestClient,
+        auth_token: str,
+        settings: MagicMock,
+    ) -> None:
+        app = client.app
+        from whattocook.config import get_settings as config_get_settings
+        from whattocook.dependencies import get_job_queue
+
+        mock_queue = MockJobQueue()
+        app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
+        app.dependency_overrides[get_job_queue] = lambda: mock_queue  # type: ignore[union-attr]
+
+        job_id = "job-foreign"
+        mock_queue.jobs[job_id] = {
+            "job_id": job_id,
+            "status": "processing",
+            "payload": {"user_id": str(uuid.uuid4())},
+        }
+
+        response = client.get(
+            f"/api/jobs/{job_id}",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+
+        app.dependency_overrides.clear()  # type: ignore[union-attr]
+
+        assert response.status_code == 404
+
+
+class TestRecipeNutritionEndpoints:
+    def test_get_recipe_nutrition_success(
+        self,
+        client: TestClient,
+        auth_token: str,
+        settings: MagicMock,
+    ) -> None:
+        app = client.app
+        from whattocook.config import get_settings as config_get_settings
+        from whattocook.db.session import get_session
+
+        mock_session = AsyncMock()
+
+        async def fake_session():
+            yield mock_session
+
+        mock_recipe = MagicMock()
+        mock_recipe.user_id = USER_ID
+        mock_recipe.calories = 560.0
+        mock_recipe.protein = 42.5
+        mock_recipe.carbs = 33.2
+        mock_recipe.fat = 21.1
+
+        app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
+        app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
+
+        with patch("whattocook.api.recipe_nutrition.RecipeRepository") as MockRecipeRepo:
+            MockRecipeRepo.return_value.get_by_id = AsyncMock(return_value=mock_recipe)
+
+            response = client.get(
+                f"/api/recipes/{RECIPE_ID}/nutrition",
+                headers={"Authorization": f"Bearer {auth_token}"},
+            )
+
+        app.dependency_overrides.clear()  # type: ignore[union-attr]
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["calories"] == 560.0
+        assert data["protein"] == 42.5
+        assert data["carbs"] == 33.2
+        assert data["fat"] == 21.1
+
+
+class TestUserPreferencesEndpoints:
+    def test_get_user_preferences_success(
+        self,
+        client: TestClient,
+        auth_token: str,
+        settings: MagicMock,
+    ) -> None:
+        app = client.app
+        from whattocook.config import get_settings as config_get_settings
+        from whattocook.db.session import get_session
+
+        mock_session = AsyncMock()
+
+        async def fake_session():
+            yield mock_session
+
+        app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
+        app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
+
+        with patch("whattocook.api.user_preferences.UserRepository") as MockUserRepo:
+            MockUserRepo.return_value.get_preferences = AsyncMock(
+                return_value={"diet": "vegetarian", "allergens": ["nuts"]}
+            )
+
+            response = client.get(
+                "/api/users/me/preferences",
+                headers={"Authorization": f"Bearer {auth_token}"},
+            )
+
+        app.dependency_overrides.clear()  # type: ignore[union-attr]
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["preferences"]["diet"] == "vegetarian"
+        assert data["preferences"]["allergens"] == ["nuts"]
+
+    def test_put_user_preferences_success(
+        self,
+        client: TestClient,
+        auth_token: str,
+        settings: MagicMock,
+    ) -> None:
+        app = client.app
+        from whattocook.config import get_settings as config_get_settings
+        from whattocook.db.session import get_session
+
+        mock_session = AsyncMock()
+        mock_session.commit = AsyncMock()
+
+        async def fake_session():
+            yield mock_session
+
+        app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
+        app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
+
+        body = {"preferences": {"diet": "keto", "max_calories": 700}}
+
+        with patch("whattocook.api.user_preferences.UserRepository") as MockUserRepo:
+            MockUserRepo.return_value.update_preferences = AsyncMock(
+                return_value=body["preferences"]
+            )
+
+            response = client.put(
+                "/api/users/me/preferences",
+                json=body,
+                headers={"Authorization": f"Bearer {auth_token}"},
+            )
+
+        app.dependency_overrides.clear()  # type: ignore[union-attr]
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["preferences"] == body["preferences"]
 
     def test_get_recipe_wrong_user(
         self,

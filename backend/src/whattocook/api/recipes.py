@@ -9,12 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from whattocook.api.auth import get_current_user_id
-from whattocook.api.schemas import (
-    RecipeDetailResponse,
-    RecipeImageResponse,
-    RecipeResponse,
-    ReferenceResponse,
-)
+from whattocook.api.recipe_mappers import map_recipe_detail, map_recipe_summary
+from whattocook.api.schemas import RecipeDetailResponse, RecipeResponse
 from whattocook.db.repositories.recipe import RecipeRepository
 from whattocook.db.session import get_session
 
@@ -27,32 +23,22 @@ async def list_recipes(
     session: AsyncSession = Depends(get_session),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    search: str | None = Query(None, min_length=1, max_length=200),
+    cuisine: str | None = Query(None, min_length=1, max_length=100),
+    tags: str | None = Query(None, description="Comma-separated tags"),
 ) -> list[RecipeResponse]:
     """List all recipes for the current user."""
     repo = RecipeRepository(session)
-    recipes = await repo.list_by_user(user_id, limit=limit, offset=offset)
-
-    result = []
-    for recipe in recipes:
-        image_url = None
-        if recipe.images:
-            image_url = recipe.images[0].image_key
-        result.append(
-            RecipeResponse(
-                id=recipe.id,
-                title=recipe.title,
-                description=recipe.description,
-                cuisine=recipe.cuisine,
-                difficulty=recipe.difficulty,
-                prep_time_minutes=recipe.prep_time_minutes,
-                cook_time_minutes=recipe.cook_time_minutes,
-                servings=recipe.servings,
-                created_at=recipe.created_at,
-                image_url=image_url,
-            )
-        )
-
-    return result
+    parsed_tags = [tag.strip() for tag in (tags or "").split(",") if tag.strip()]
+    recipes = await repo.list_by_user(
+        user_id,
+        limit=limit,
+        offset=offset,
+        search=search,
+        cuisine=cuisine,
+        tags=parsed_tags,
+    )
+    return [map_recipe_summary(recipe) for recipe in recipes]
 
 
 @router.get("/{recipe_id}", response_model=RecipeDetailResponse)
@@ -71,35 +57,4 @@ async def get_recipe(
             detail="Recipe not found",
         )
 
-    references = [
-        ReferenceResponse(
-            relevance_score=ref.relevance_score,
-            snippet=ref.snippet,
-        )
-        for ref in recipe.references
-    ]
-
-    images = [
-        RecipeImageResponse(
-            image_key=img.image_key,
-            prompt_used=img.prompt_used,
-            model_version=img.model_version,
-        )
-        for img in recipe.images
-    ]
-
-    return RecipeDetailResponse(
-        id=recipe.id,
-        title=recipe.title,
-        description=recipe.description,
-        ingredients_json=recipe.ingredients_json,
-        instructions_json=recipe.instructions_json,
-        cuisine=recipe.cuisine,
-        difficulty=recipe.difficulty,
-        prep_time_minutes=recipe.prep_time_minutes,
-        cook_time_minutes=recipe.cook_time_minutes,
-        servings=recipe.servings,
-        created_at=recipe.created_at,
-        references=references,
-        images=images,
-    )
+    return map_recipe_detail(recipe)

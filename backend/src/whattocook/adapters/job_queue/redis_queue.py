@@ -66,12 +66,14 @@ class RedisQueueAdapter(JobQueuePort):
 
         return job_data
 
-    async def complete(self, job_id: str) -> None:
+    async def complete(self, job_id: str, result: dict[str, Any] | None = None) -> None:
         raw = await self._redis.get(f"{JOB_PREFIX}{job_id}")
         if raw:
             job_data = json.loads(raw)
             job_data["status"] = "completed"
             job_data["completed_at"] = datetime.utcnow().isoformat()
+            if result is not None:
+                job_data["result"] = result
             await self._redis.set(
                 f"{JOB_PREFIX}{job_id}",
                 json.dumps(job_data),
