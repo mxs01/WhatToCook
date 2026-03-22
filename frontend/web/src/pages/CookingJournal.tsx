@@ -1,61 +1,9 @@
-import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
 export default function CookingJournal() {
-  const { user } = useAuth();
-  const displayName = user?.name || "Alexander";
 
   return (
-    <div className="pt-32 pb-20 px-12 max-w-[1600px] mx-auto min-h-[calc(100vh-80px)] text-on-surface">
-      <div className="grid grid-cols-12 gap-16">
-        
-        {/* Sidebar / Left Column */}
-        <aside className="col-span-12 md:col-span-4 lg:col-span-3">
-          <div className="sticky top-32 flex flex-col items-center text-center space-y-12">
-            <div className="w-48 h-48 rounded-full p-1 bg-gradient-to-tr from-primary-container to-primary shadow-xl mb-8">
-              <div className="w-full h-full rounded-full overflow-hidden border-4 border-surface-container-lowest">
-                <img 
-                  className="w-full h-full object-cover" 
-                  alt={`Profile avatar of ${displayName}`}
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn7s_fSgwJXc4OgyNd_ALXrtdHVLhqomIpxdOnBDMZc-jwayCoJV7JdzPMRVwRj2RFNOZRXoHEoWSsPPHBKl1haRVV6oD-SoQ6CKnCozRBO6qUB2D5_yv0Ikl-IjVdDQ-eVxs7W9fveC5fQoy_qis8zhWiJGMU0G0xGHbJQqT7OrTMcr0DoMG43yzbX0lJrgEZfp3VCMj-mYGvl6eGUs2TmszBJKyubmQ1BVuMYF-Fip6OgcyyzygsT6H4z1jLsOQx-Z32p0RhV0NU"
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <h1 className="text-3xl font-serif text-primary font-bold tracking-tight">{displayName}</h1>
-              <p className="text-secondary font-sans">{user?.email || "lukas@cook.ai"}</p>
-            </div>
-            
-            <div className="mt-6">
-              <span className="px-4 py-1.5 bg-primary text-white dark:bg-stone-50 dark:text-primary text-xs font-bold uppercase tracking-widest rounded-full shadow-sm">
-                Pro Member
-              </span>
-            </div>
-            
-            <nav className="w-full mt-16 space-y-4">
-              <Link className="flex items-center gap-4 px-6 py-3 text-secondary hover:bg-surface-container-highest rounded-full transition-all" to="/settings">
-                <span className="material-symbols-outlined text-lg">person</span>
-                <span className="font-sans">Profile Details</span>
-              </Link>
-              <Link className="flex items-center gap-4 px-6 py-3 text-secondary hover:bg-surface-container-highest rounded-full transition-all" to="/pantry">
-                <span className="material-symbols-outlined text-lg">kitchen</span>
-                <span className="font-sans">My Pantry</span>
-              </Link>
-              <Link className="flex items-center gap-4 px-6 py-3 bg-primary/5 text-primary rounded-full font-semibold transition-all" to="/journal">
-                <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>history</span>
-                <span className="font-sans">Cooking Journal</span>
-              </Link>
-              <Link className="flex items-center gap-4 px-6 py-3 text-secondary hover:bg-surface-container-highest rounded-full transition-all" to="/billing">
-                <span className="material-symbols-outlined text-lg">credit_card</span>
-                <span className="font-sans">Billing History</span>
-              </Link>
-            </nav>
-          </div>
-        </aside>
-
-        {/* Main Content / Right Column */}
-        <div className="col-span-12 md:col-span-8 lg:col-span-9 space-y-16">
+    <div className="space-y-16 w-full">
         
         {/* Cover Image/Header Section */}
         <div className="h-64 md:h-80 w-full relative bg-surface-container-high overflow-hidden">
@@ -202,8 +150,6 @@ export default function CookingJournal() {
           </div>
 
         </div>
-        </div>
-      </div>
     </div>
   );
 }
