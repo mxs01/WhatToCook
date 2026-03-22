@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
+import ScrollToTop from './components/ScrollToTop';
 
 import Footer from './components/Footer';
 
@@ -14,10 +15,16 @@ import AccountSettings from './pages/AccountSettings';
 import MyPantry from './pages/MyPantry';
 import BillingHistory from './pages/BillingHistory';
 import CookingJournal from './pages/CookingJournal';
+import AdminDashboard from './pages/AdminDashboard';
+import UserManagement from './pages/UserManagement';
+import RecipeAnalytics from './pages/RecipeAnalytics';
+import Impressum from './pages/Impressum';
+import ContactUs from './pages/ContactUs';
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="antialiased selection:bg-primary/20 selection:text-primary scroll-smooth min-h-[100dvh] flex flex-col bg-surface">
         <Navigation />
         <main className="flex-1 w-full relative">
@@ -32,6 +39,11 @@ function App() {
             <Route path="/pantry" element={<MyPantry />} />
             <Route path="/billing" element={<BillingHistory />} />
             <Route path="/journal" element={<CookingJournal />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/analytics" element={<RecipeAnalytics />} />
+            <Route path="/impressum" element={<Impressum />} />
+            <Route path="/contact" element={<ContactUs />} />
           </Routes>
         </main>
         <Footer />
