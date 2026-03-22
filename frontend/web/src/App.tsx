@@ -11,11 +11,14 @@ import PersonalizationOnboarding from './pages/PersonalizationOnboarding';
 import ScanPage from './pages/ScanPage';
 import RecipeDetails from './pages/RecipeDetails';
 import AccountSettings from './pages/AccountSettings';
+import MyPantry from './pages/MyPantry';
+import BillingHistory from './pages/BillingHistory';
+import CookingJournal from './pages/CookingJournal';
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="antialiased selection:bg-primary/20 selection:text-primary scroll-smooth min-h-[100dvh] flex flex-col">
+      <div className="antialiased selection:bg-primary/20 selection:text-primary scroll-smooth min-h-[100dvh] flex flex-col bg-surface">
         <Navigation />
         <main className="flex-1 w-full relative">
           <Routes>
@@ -26,6 +29,9 @@ function App() {
             <Route path="/scan" element={<ScanPage />} />
             <Route path="/recipe/:id" element={<RecipeDetails />} />
             <Route path="/settings" element={<AccountSettings />} />
+            <Route path="/pantry" element={<MyPantry />} />
+            <Route path="/billing" element={<BillingHistory />} />
+            <Route path="/journal" element={<CookingJournal />} />
           </Routes>
         </main>
         <Footer />
