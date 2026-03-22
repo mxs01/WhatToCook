@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from whattocook.api.router import api_router
 from whattocook.config import get_settings
 from whattocook.db.session import engine
+from whattocook.telemetry import setup_telemetry
 
 
 @asynccontextmanager
@@ -41,6 +42,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(api_router)
+    setup_telemetry(settings, app=app, engine=engine)
 
     return app
 

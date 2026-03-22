@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ba1a1a",
+              "on-tertiary": "#ffffff",
+              "on-surface": "#1a1c1c",
+              "on-background": "#1a1c1c",
+              "on-surface-variant": "#434843",
+              "primary-container": "#1b3022",
+              "on-secondary-fixed-variant": "#474747",
+              "tertiary-container": "#3f2427",
+              "on-error-container": "#93000a",
+              "surface-container-high": "#e8e8e8",
+              "on-tertiary-container": "#b0898c",
+              "inverse-surface": "#2f3131",
+              "surface-variant": "#e2e2e2",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c3c8c1",
+              "on-secondary-container": "#656464",
+              "surface-container-highest": "#e2e2e2",
+              "on-error": "#ffffff",
+              "surface-container-low": "#f3f3f3",
+              "tertiary-fixed": "#ffd9dc",
+              "surface-dim": "#dadada",
+              "secondary-fixed-dim": "#c8c6c5",
+              "on-primary": "#ffffff",
+              "error-container": "#ffdad6",
+              "background": "#f9f9f9",
+              "on-tertiary-fixed-variant": "#5d3f42",
+              "surface-bright": "#f9f9f9",
+              "secondary": "#5f5e5e",
+              "surface-tint": "#4d6453",
+              "secondary-fixed": "#e4e2e1",
+              "inverse-primary": "#b4cdb8",
+              "primary": "#061b0e",
+              "inverse-on-surface": "#f1f1f1",
+              "on-secondary-fixed": "#1b1c1c",
+              "on-primary-fixed": "#0b2013",
+              "tertiary-fixed-dim": "#e7bcbf",
+              "tertiary": "#271013",
+              "secondary-container": "#e4e2e1",
+              "outline": "#737973",
+              "on-tertiary-fixed": "#2d1417",
+              "on-primary-fixed-variant": "#364c3c",
+              "primary-fixed-dim": "#b4cdb8",
+              "primary-fixed": "#d0e9d4",
+              "on-secondary": "#ffffff",
+              "surface-container": "#eeeeee",
+              "surface": "#f9f9f9",
+              "on-primary-container": "#819986"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-primary-gradient {
+            background: linear-gradient(45deg, #061b0e 0%, #1b3022 100%);
+        }
+        .ghost-border {
+            border: 1px solid rgba(195, 200, 193, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-stone-950/80 backdrop-blur-xl">
+<div class="max-w-7xl mx-auto px-8 py-6 flex justify-between items-center">
+<div class="text-2xl font-serif font-bold text-emerald-950 dark:text-emerald-50">WhatToCook</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="font-serif italic tracking-tight text-stone-500 dark:text-stone-400 hover:text-emerald-900 dark:hover:text-emerald-200 transition-colors" href="#">Vision Scan</a>
+<a class="font-serif italic tracking-tight text-stone-500 dark:text-stone-400 hover:text-emerald-900 dark:hover:text-emerald-200 transition-colors" href="#">Chef Logic</a>
+<a class="font-serif italic tracking-tight text-stone-500 dark:text-stone-400 hover:text-emerald-900 dark:hover:text-emerald-200 transition-colors" href="#">Studio Visuals</a>
+<a class="font-serif italic tracking-tight text-stone-500 dark:text-stone-400 hover:text-emerald-900 dark:hover:text-emerald-200 transition-colors" href="#">Recipes</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="bg-primary-gradient text-on-primary px-8 py-3 rounded-full font-label text-sm uppercase tracking-widest hover:opacity-80 transition-all duration-300 scale-95 active:scale-90">Get Started</button>
+<span class="material-symbols-outlined text-emerald-950 dark:text-emerald-50 cursor-pointer">menu</span>
+</div>
+</div>
+</nav>
+<main class="pt-32">
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-8 mb-32 md:mb-56">
+<div class="flex flex-col md:flex-row items-end gap-12">
+<div class="md:w-2/3">
+<h1 class="font-headline text-6xl md:text-8xl lg:text-[7rem] leading-[0.9] -tracking-[0.04em] text-primary">
+                        The Art of <br/><span class="italic font-normal">Artificial</span> <br/>Intelligence
+                    </h1>
+</div>
+<div class="md:w-1/3 pb-4">
+<p class="font-body text-xl text-secondary leading-relaxed max-w-sm">
+                        WhatToCook reimagines the culinary workflow, transforming chaotic kitchen inventories into curated epicurean experiences through a trio of proprietary AI modules.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Step 1: Vision Scan -->
+<section class="mb-32 md:mb-56 overflow-hidden">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row gap-16 items-center">
+<div class="md:w-1/2 order-2 md:order-1">
+<div class="space-y-8 max-w-md">
+<span class="font-label text-xs tracking-[0.3em] uppercase text-secondary">Module 01</span>
+<h2 class="font-headline text-5xl text-primary tracking-tight">Vision Scan</h2>
+<p class="font-body text-lg text-secondary leading-relaxed">
+                            Intelligent object recognition identifies every ingredient in real-time. Simply open your larder or refrigerator; our visual engine catalogs textures, quantities, and expiration states with surgical precision.
+                        </p>
+<div class="pt-4">
+<div class="w-12 h-[1px] bg-primary-container/20"></div>
+</div>
+</div>
+</div>
+<div class="md:w-1/2 order-1 md:order-2">
+<div class="relative group">
+<div class="absolute inset-0 bg-primary/5 rounded-xl -rotate-2 scale-105 group-hover:rotate-0 transition-transform duration-700"></div>
+<img alt="Sleek refrigerator interior" class="relative w-full aspect-[4/5] object-cover rounded-xl shadow-2xl" data-alt="Sleek modern refrigerator interior with organized fresh ingredients" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsYLkGcRBoW5cNJVRWHQmyjVS84E9PDCEU6JmwI2P6Ab-UIrasvOSEjCfSTnLLA7oHbGsuX-rUgYoGVlxpbYDgVjacV5CYrAhVJ60rj0sEu8t-KAtPXvtfkr2d7GEGdcmK7-hC2ZL1-w_XpP-71_OSPr-zF81bD3gr8TqXjXBc06Rnq4XvQOKGadnq1S7ZVLvjTbJbrGeME9hj_MZlkVXjI2QHigbhyLu1bkCd_CnWCdHx8jY5rEhId1zvwojIy95XkWHX9LfMCAoR"/>
+<div class="absolute top-8 right-8 bg-white/20 backdrop-blur-md rounded-full px-6 py-2 border border-white/30 text-white font-label text-xs tracking-widest uppercase">
+                            Active Scan: 98%
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Step 2: Chef Logic -->
+<section class="bg-surface-container-low py-32 md:py-56 mb-32 md:mb-56">
+<div class="max-w-7xl mx-auto px-8">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+<div class="md:col-span-7">
+<div class="relative">
+<img alt="Gourmet plating visual" class="w-full aspect-video object-cover rounded-xl grayscale-[0.2] hover:grayscale-0 transition-all duration-1000 shadow-xl" data-alt="Exquisite gourmet dish plated with artistic precision" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3-FeBHSkeiF5CrnqlCQPWGETq8GwwRjfnkRkkJIQ99Hqc27xczIyhx5OY4JAmMv4HizJq2GAgrWHaSd1-6bhKJGA__bIuZGPjOc86scMgNhl87XW-XV69GcNeOCMrK51M26rbtFHLIjAElVMN4KT_Yu7H8ADZOhouFyIyDh_CCyUR8YT2SuXne5M4wN0fAWgLLXvXJzjXL_4WPnZQ4iNgGaoOL_qyQIMt3mrbYBfMi0eFDZXIlOL-nW5TzlB-1l520NUon8_MbQny"/>
+<div class="absolute -bottom-12 -right-12 hidden lg:block">
+<div class="bg-primary p-12 rounded-lg text-on-primary max-w-xs shadow-2xl">
+<span class="material-symbols-outlined text-4xl mb-4">psychology</span>
+<p class="font-headline italic text-xl">"Flavor profiles balanced against macro-economic nutritional data."</p>
+</div>
+</div>
+</div>
+</div>
+<div class="md:col-span-5 md:pl-16">
+<div class="space-y-8">
+<span class="font-label text-xs tracking-[0.3em] uppercase text-secondary">Module 02</span>
+<h2 class="font-headline text-5xl text-primary tracking-tight">Chef Logic</h2>
+<p class="font-body text-lg text-secondary leading-relaxed">
+                                Our AI agent crafts bespoke recipes based on your tastes, macros, and available ingredients. It doesn't just search a database—it synthesizes culinary physics to invent new possibilities tailored to your palate.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Step 3: Studio Visuals -->
+<section class="max-w-7xl mx-auto px-8 mb-32 md:mb-56">
+<div class="flex flex-col gap-12">
+<div class="flex flex-col md:flex-row justify-between items-end gap-8">
+<div class="max-w-xl">
+<span class="font-label text-xs tracking-[0.3em] uppercase text-secondary">Module 03</span>
+<h2 class="font-headline text-5xl md:text-6xl text-primary tracking-tight mt-6">Studio Visuals</h2>
+</div>
+<p class="md:max-w-md font-body text-lg text-secondary leading-relaxed">
+                        Receive a professional cookbook-quality photo of your dish before you even turn on the stove. Our neural renderer predicts the final aesthetic result of your specific recipe.
+                    </p>
+</div>
+<div class="mt-12">
+<div class="relative h-[716px] w-full overflow-hidden rounded-xl">
+<img alt="Professional food photography" class="w-full h-full object-cover" data-alt="Stunning cinematic food photography of a roasted dish" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGGpmn1yqlvJrEAjUpPxvl1nT8jhGupa-U3KVIcGD_s-rQmOqr8ta4NkJyf-ACXUispNoCuIMw-bCCuXRFt_3t0CLHd7IPTrZMkVdi6ATuYQtwnpFz-mNMuX_DK3Pv2XBqhkfHy_xRx1ZxsMXIjqwstP6zwIiXUHoTlwm_Z-sDS7pghVfza-nO_HUrCn346oThF2vYcmq0j8sgRnxg7Gz-KpAVFE1-hw3c5nBZYL0HPWJLH0ejioWLhkaCnbXtowNirdS37YZ5CH-N"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent flex items-end p-12 md:p-20">
+<div class="text-on-primary">
+<p class="font-label text-xs tracking-[0.4em] uppercase opacity-70 mb-4">AI Prediction Render</p>
+<h3 class="font-headline text-4xl italic">Smoked Aubergine with Velvet Reduction</h3>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Call to Action -->
+<section class="max-w-4xl mx-auto px-8 text-center pb-32 md:pb-56">
+<div class="bg-surface-container border border-outline-variant/10 rounded-xl p-16 md:p-24 flex flex-col items-center">
+<h2 class="font-headline text-4xl md:text-6xl text-primary mb-8 tracking-tight">Begin your curation.</h2>
+<p class="font-body text-secondary text-xl mb-12 max-w-lg leading-relaxed">
+                    Elevate your daily ritual from necessity to artistry. The Digital Epicurean awaits your first scan.
+                </p>
+<button class="bg-primary-gradient text-on-primary px-12 py-5 rounded-full font-label text-sm uppercase tracking-[0.2em] hover:opacity-90 transition-all duration-300 scale-100 active:scale-95 shadow-2xl">
+                    Get Started
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900">
+<div class="max-w-7xl mx-auto px-12 py-16 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="text-lg font-serif italic text-emerald-900 dark:text-emerald-100">WhatToCook</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-sans text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500 hover:text-emerald-700 dark:hover:text-emerald-300 underline decoration-emerald-900/30 dark:decoration-emerald-100/30 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-sans text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500 hover:text-emerald-700 dark:hover:text-emerald-300 underline decoration-emerald-900/30 dark:decoration-emerald-100/30 transition-opacity" href="#">Terms of Service</a>
+<a class="font-sans text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500 hover:text-emerald-700 dark:hover:text-emerald-300 underline decoration-emerald-900/30 dark:decoration-emerald-100/30 transition-opacity" href="#">Culinary Manifesto</a>
+<a class="font-sans text-xs tracking-widest uppercase text-stone-400 dark:text-stone-500 hover:text-emerald-700 dark:hover:text-emerald-300 underline decoration-emerald-900/30 dark:decoration-emerald-100/30 transition-opacity" href="#">Contact</a>
+</div>
+<div class="font-sans text-xs tracking-widest uppercase text-emerald-950 dark:text-emerald-50">
+                © 2024 WhatToCook. The Digital Epicurean.
+            </div>
+</div>
+</footer>
+</body></html>

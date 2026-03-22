@@ -20,6 +20,7 @@ import UserManagement from './pages/UserManagement';
 import RecipeAnalytics from './pages/RecipeAnalytics';
 import Impressum from './pages/Impressum';
 import ContactUs from './pages/ContactUs';
+import HowItWorks from './pages/HowItWorks';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
             <Route path="/admin/analytics" element={<RecipeAnalytics />} />
             <Route path="/impressum" element={<Impressum />} />
             <Route path="/contact" element={<ContactUs />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
           </Route>
 
           <Route element={<DashboardLayout />}>

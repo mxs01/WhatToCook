@@ -52,6 +52,11 @@ class Settings(BaseSettings):
     # Image Generation
     flux_worker_url: str = "http://localhost:8100"
 
+    # OpenTelemetry
+    otel_enabled: bool = False
+    otel_service_name: str = "whattocook-backend"
+    otel_exporter_otlp_endpoint: str = "http://localhost:4317"
+
     # Object Storage
     s3_endpoint_url: str = "http://localhost:9000"
     s3_access_key_id: str = "minioadmin"

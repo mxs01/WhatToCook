@@ -21,17 +21,20 @@ const Navigation = () => {
         <div className="font-serif text-3xl font-extrabold tracking-tighter text-primary">
           <Link to="/">WhatToCook</Link>
         </div>
-        <div className="hidden md:flex gap-10 items-center">
-          <NavLink to="/" end className={getLinkClasses}>Home</NavLink>
-          <NavLink to="/scan" className={getLinkClasses}>Scanner</NavLink>
-          <NavLink to="/gallery" className={getLinkClasses}>Recipes</NavLink>
-          <NavLink to="/settings" className={getLinkClasses}>About</NavLink>
-        </div>
+        {isAuthenticated && (
+          <div className="hidden md:flex gap-10 items-center">
+            <NavLink to="/" end className={getLinkClasses}>Home</NavLink>
+            <NavLink to="/scan" className={getLinkClasses}>Scanner</NavLink>
+            <NavLink to="/gallery" className={getLinkClasses}>Recipes</NavLink>
+            <NavLink to="/settings" className={getLinkClasses}>About</NavLink>
+          </div>
+        )}
         <div className="flex items-center gap-6">
-          <button className="text-secondary hover:opacity-80 transition-opacity duration-300">
-            <span className="material-symbols-outlined">search</span>
-          </button>
-          
+          {isAuthenticated && (
+            <button className="text-secondary hover:opacity-80 transition-opacity duration-300">
+              <span className="material-symbols-outlined">search</span>
+            </button>
+          )}
           {isAuthenticated ? (
             <button 
               onClick={handleLogout}

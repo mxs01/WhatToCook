@@ -1,4 +1,11 @@
 services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - '16686:16686'
+      - '4317:4317'
+      - '4318:4318'
+
   postgres:
     image: pgvector/pgvector:pg16
     environment:
@@ -71,7 +78,12 @@ services:
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT_URL: http://minio:9000
       FLUX_WORKER_URL: http://flux-worker:8100
+      OTEL_ENABLED: "true"
+      OTEL_SERVICE_NAME: whattocook-backend
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
     depends_on:
+      jaeger:
+        condition: service_started
       postgres:
         condition: service_healthy
       redis:
@@ -95,7 +107,12 @@ services:
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT_URL: http://minio:9000
       FLUX_WORKER_URL: http://flux-worker:8100
+      OTEL_ENABLED: "true"
+      OTEL_SERVICE_NAME: whattocook-worker
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
     depends_on:
+      jaeger:
+        condition: service_started
       postgres:
         condition: service_healthy
       redis:
@@ -124,6 +141,13 @@ services:
       dockerfile: Dockerfiles/flux.Dockerfile
     ports:
       - '8100:8100'
+    environment:
+      OTEL_ENABLED: "true"
+      OTEL_SERVICE_NAME: whattocook-flux-worker
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+    depends_on:
+      jaeger:
+        condition: service_started
     volumes:
       - flux-cache:/root/.cache/huggingface
     deploy:

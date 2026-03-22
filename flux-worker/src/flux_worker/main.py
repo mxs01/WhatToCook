@@ -4,17 +4,25 @@ from __future__ import annotations
 
 import io
 import logging
+import os
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from flux_worker.pipeline import FluxPipeline
+from flux_worker.telemetry import setup_telemetry
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="FLUX Dev Worker", version="0.1.0")
+setup_telemetry(
+    enabled=os.getenv("OTEL_ENABLED", "false").lower() == "true",
+    service_name=os.getenv("OTEL_SERVICE_NAME", "whattocook-flux-worker"),
+    otlp_endpoint=os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"),
+    app=app,
+)
 
 # Pipeline is loaded lazily on first request
 _pipeline: FluxPipeline | None = None

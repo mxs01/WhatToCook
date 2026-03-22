@@ -106,6 +106,7 @@ This starts:
 | `redis` | 6379 | Job queue |
 | `minio` | 9000 / 9001 | Object storage (API / Console) |
 | `flux-worker` | 8100 | FLUX image generation (GPU profile only) |
+| `jaeger` | 16686 | OpenTelemetry trace UI |
 
 ### 3. Seed the RAG database
 
@@ -120,6 +121,7 @@ docker compose exec backend python -m scripts.seed_recipes
 - **Frontend**: http://localhost:3000
 - **API docs**: http://localhost:8080/docs (Swagger, dev only)
 - **MinIO console**: http://localhost:9001 (login: `minioadmin` / `minioadmin`)
+- **Jaeger UI**: http://localhost:16686
 
 #### Workflow
 
@@ -205,6 +207,11 @@ See `.env.example` for the full list. Key variables:
 | `GEMINI_API_KEY` | — | Required if using Gemini provider |
 | `FLUX_WORKER_URL` | `http://localhost:8100` | FLUX image generation endpoint |
 | `S3_ENDPOINT_URL` | `http://localhost:9000` | MinIO/S3 endpoint |
+| `OTEL_ENABLED` | `false` | Enable OpenTelemetry tracing in backend/worker |
+| `OTEL_SERVICE_NAME` | `whattocook-backend` | Service name shown in traces |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317` | OTLP gRPC collector endpoint |
+| `VITE_OTEL_ENABLED` | `false` | Enable browser tracing |
+| `VITE_OTEL_EXPORTER_URL` | `http://localhost:4318/v1/traces` | Browser OTLP HTTP endpoint |
 
 ## Production Deployment
 
