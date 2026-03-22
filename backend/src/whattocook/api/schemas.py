@@ -36,6 +36,63 @@ class UserResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class ActiveSessionResponse(BaseModel):
+    session_id: uuid.UUID
+    user_agent: str
+    created_at: datetime
+    last_active_at: datetime
+
+
+class PricingPlanResponse(BaseModel):
+    id: uuid.UUID
+    name: str
+    price: float
+    llm_generations_per_week: int
+
+
+class PaymentDurationResponse(BaseModel):
+    id: uuid.UUID
+    duration: str
+
+
+class UserPricingResponse(BaseModel):
+    pricing_plan: PricingPlanResponse | None = None
+    payment_duration: PaymentDurationResponse | None = None
+
+
+class AdminCreatePricingPlanRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    price: float = Field(ge=0)
+    llm_generations_per_week: int = Field(ge=0)
+
+
+class AdminUpdatePricingPlanRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=100)
+    price: float | None = Field(default=None, ge=0)
+    llm_generations_per_week: int | None = Field(default=None, ge=0)
+
+
+class AdminCreatePaymentDurationRequest(BaseModel):
+    duration: str = Field(pattern="^(monthly|annual)$")
+
+
+class AdminUpdatePaymentDurationRequest(BaseModel):
+    duration: str = Field(pattern="^(monthly|annual)$")
+
+
+class AdminAssignUserBillingRequest(BaseModel):
+    pricing_plan_id: uuid.UUID | None = None
+    payment_duration_id: uuid.UUID | None = None
+
+
+class UserProfileDashboardResponse(BaseModel):
+    user: UserResponse
+    pricing_plan: PricingPlanResponse | None = None
+    payment_duration: PaymentDurationResponse | None = None
+    active_sessions: list[ActiveSessionResponse] = Field(default_factory=list)
+    recipes: list[RecipeResponse] = Field(default_factory=list)
+
+
 # ─── Uploads ─────────────────────────────────────────────────────────────────
 
 

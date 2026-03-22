@@ -7,6 +7,8 @@ from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
     DateTime,
     Float,
     ForeignKey,
@@ -29,6 +31,12 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     display_name: Mapped[str | None] = mapped_column(String(100))
+    pricing_plan_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("pricing_plans.id"), nullable=True, index=True
+    )
+    payment_duration_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("payment_durations.id"), nullable=True, index=True
+    )
     preferences_json: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
@@ -37,6 +45,53 @@ class User(Base):
 
     uploads: Mapped[list[FridgeUpload]] = relationship(back_populates="user")
     recipes: Mapped[list[Recipe]] = relationship(back_populates="user")
+    sessions: Mapped[list[UserSession]] = relationship(back_populates="user")
+    pricing_plan: Mapped[PricingPlan | None] = relationship(back_populates="users")
+    payment_duration: Mapped[PaymentDuration | None] = relationship(back_populates="users")
+
+
+class PricingPlan(Base):
+    __tablename__ = "pricing_plans"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    price: Mapped[float] = mapped_column(Float, nullable=False)
+    llm_generations_per_week: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    users: Mapped[list[User]] = relationship(back_populates="pricing_plan")
+
+
+class PaymentDuration(Base):
+    __tablename__ = "payment_durations"
+    __table_args__ = (
+        CheckConstraint(
+            "duration IN ('monthly', 'annual')",
+            name="ck_payment_durations_duration",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    duration: Mapped[str] = mapped_column(String(20), nullable=False, unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    users: Mapped[list[User]] = relationship(back_populates="payment_duration")
+
+
+class UserSession(Base):
+    __tablename__ = "user_sessions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    session_key: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)
+    user_agent: Mapped[str] = mapped_column(String(500), nullable=False, default="unknown")
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    last_active_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped[User] = relationship(back_populates="sessions")
 
 
 class FridgeUpload(Base):

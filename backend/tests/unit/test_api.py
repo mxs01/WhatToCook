@@ -693,3 +693,157 @@ class TestUserPreferencesEndpoints:
         app.dependency_overrides.clear()  # type: ignore[union-attr]
 
         assert response.status_code == 404
+
+
+class TestUserProfileEndpoints:
+    def test_get_my_profile_dashboard_success(
+        self,
+        client: TestClient,
+        auth_token: str,
+        settings: MagicMock,
+    ) -> None:
+        from datetime import datetime
+
+        app = client.app
+        from whattocook.config import get_settings as config_get_settings
+        from whattocook.db.session import get_session
+
+        mock_session = AsyncMock()
+
+        async def fake_session():
+            yield mock_session
+
+        app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
+        app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
+
+        mock_user = MagicMock()
+        mock_user.id = USER_ID
+        mock_user.email = "chef@example.com"
+        mock_user.display_name = "Chef"
+        mock_user.created_at = datetime(2025, 1, 1)
+        mock_user.pricing_plan = MagicMock(
+            id=uuid.uuid4(),
+            name="Pro",
+            price=9.99,
+            llm_generations_per_week=100,
+        )
+        mock_user.payment_duration = MagicMock(id=uuid.uuid4(), duration="monthly")
+
+        mock_session_item = MagicMock()
+        mock_session_item.id = uuid.uuid4()
+        mock_session_item.user_agent = "pytest-agent"
+        mock_session_item.created_at = datetime(2025, 1, 2)
+        mock_session_item.last_active_at = datetime(2025, 1, 3)
+
+        mock_recipe = MagicMock()
+        mock_recipe.id = RECIPE_ID
+        mock_recipe.title = "Profile Recipe"
+        mock_recipe.description = "From profile endpoint"
+        mock_recipe.cuisine = "Italian"
+        mock_recipe.difficulty = "easy"
+        mock_recipe.prep_time_minutes = 10
+        mock_recipe.cook_time_minutes = 15
+        mock_recipe.servings = 2
+        mock_recipe.created_at = datetime(2025, 1, 4)
+        mock_recipe.images = []
+        mock_recipe.tags_json = []
+
+        with (
+            patch("whattocook.api.user_profile.UserRepository") as MockUserRepo,
+            patch("whattocook.api.user_profile.RecipeRepository") as MockRecipeRepo,
+        ):
+            MockUserRepo.return_value.get_by_id = AsyncMock(return_value=mock_user)
+            MockUserRepo.return_value.list_active_sessions = AsyncMock(
+                return_value=[mock_session_item]
+            )
+            MockRecipeRepo.return_value.list_by_user_since = AsyncMock(return_value=[mock_recipe])
+
+            response = client.get(
+                "/api/users/me/profile?recipe_span=7days",
+                headers={"Authorization": f"Bearer {auth_token}"},
+            )
+
+        app.dependency_overrides.clear()  # type: ignore[union-attr]
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["user"]["email"] == "chef@example.com"
+        assert data["pricing_plan"]["name"] == "Pro"
+        assert data["payment_duration"]["duration"] == "monthly"
+        assert len(data["active_sessions"]) == 1
+        assert len(data["recipes"]) == 1
+
+    def test_get_my_recipes_by_span_invalid_span(
+        self,
+        client: TestClient,
+        auth_token: str,
+        settings: MagicMock,
+    ) -> None:
+        app = client.app
+        from whattocook.config import get_settings as config_get_settings
+        from whattocook.db.session import get_session
+
+        mock_session = AsyncMock()
+
+        async def fake_session():
+            yield mock_session
+
+        app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
+        app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
+
+        response = client.get(
+            "/api/users/me/recipes?recipe_span=abc",
+            headers={"Authorization": f"Bearer {auth_token}"},
+        )
+
+        app.dependency_overrides.clear()  # type: ignore[union-attr]
+
+        assert response.status_code == 422
+
+    def test_get_my_pricing_success(
+        self,
+        client: TestClient,
+        auth_token: str,
+        settings: MagicMock,
+    ) -> None:
+        from datetime import datetime
+
+        app = client.app
+        from whattocook.config import get_settings as config_get_settings
+        from whattocook.db.session import get_session
+
+        mock_session = AsyncMock()
+
+        async def fake_session():
+            yield mock_session
+
+        app.dependency_overrides[get_session] = fake_session  # type: ignore[union-attr]
+        app.dependency_overrides[config_get_settings] = lambda: settings  # type: ignore[union-attr]
+
+        mock_user = MagicMock()
+        mock_user.id = USER_ID
+        mock_user.email = "chef@example.com"
+        mock_user.display_name = "Chef"
+        mock_user.created_at = datetime(2025, 1, 1)
+        mock_user.pricing_plan = MagicMock(
+            id=uuid.uuid4(),
+            name="Starter",
+            price=0.0,
+            llm_generations_per_week=10,
+        )
+        mock_user.payment_duration = MagicMock(id=uuid.uuid4(), duration="annual")
+
+        with patch("whattocook.api.user_profile.UserRepository") as MockUserRepo:
+            MockUserRepo.return_value.get_by_id = AsyncMock(return_value=mock_user)
+
+            response = client.get(
+                "/api/users/me/pricing",
+                headers={"Authorization": f"Bearer {auth_token}"},
+            )
+
+        app.dependency_overrides.clear()  # type: ignore[union-attr]
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["pricing_plan"]["name"] == "Starter"
+        assert data["payment_duration"]["duration"] == "annual"

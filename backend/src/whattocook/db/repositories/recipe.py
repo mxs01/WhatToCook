@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 import uuid
 
 from sqlalchemy import or_, select
@@ -115,6 +116,22 @@ class RecipeRepository:
         if row is None:
             return None
         return (row[0], row[1], row[2], row[3])
+
+    async def list_by_user_since(
+        self,
+        user_id: uuid.UUID,
+        since: datetime,
+        limit: int = 50,
+    ) -> list[Recipe]:
+        stmt = (
+            select(Recipe)
+            .where(Recipe.user_id == user_id, Recipe.created_at >= since)
+            .options(selectinload(Recipe.images))
+            .order_by(Recipe.created_at.desc())
+            .limit(limit)
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
 
     async def add_reference(
         self,

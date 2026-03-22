@@ -19,18 +19,17 @@ class Settings(BaseSettings):
     api_port: int = 8080
 
     # Database
-    database_url: str = (
-        "postgresql+asyncpg://whattocook:whattocook_dev@localhost:5432/whattocook"
-    )
+    database_url: str = "postgresql+asyncpg://whattocook:whattocook_dev@localhost:5432/whattocook"
 
     # Redis
     redis_url: str = "redis://localhost:6379/0"
 
     # JWT Auth
-    jwt_secret_key: str = "CHANGE_ME_generate_a_real_secret"
+    jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 30
     jwt_refresh_token_expire_days: int = 7
+    admin_api_key: str
 
     # LLM Provider
     llm_provider: Literal["local_vllm", "gemini", "mock"] = "local_vllm"

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Annotated
 
 import bcrypt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -98,3 +98,15 @@ async def get_current_user(
             detail="User not found",
         )
     return user
+
+
+async def require_admin_api_key(
+    x_admin_api_key: Annotated[str | None, Header(alias="X-Admin-Api-Key")] = None,
+    settings: Settings = Depends(get_settings),
+) -> None:
+    """Require a valid admin API key for admin-only endpoints."""
+    if not x_admin_api_key or x_admin_api_key != settings.admin_api_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid admin API key",
+        )

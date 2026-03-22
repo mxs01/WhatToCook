@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import inspect
+import uuid
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from whattocook.api.auth import (
@@ -53,6 +56,7 @@ async def register(
 @router.post("/login", response_model=TokenResponse)
 async def login(
     body: LoginRequest,
+    request: Request,
     session: AsyncSession = Depends(get_session),
     settings: Settings = Depends(get_settings),
 ) -> TokenResponse:
@@ -68,6 +72,14 @@ async def login(
 
     access_token = create_access_token(user.id, settings)
     refresh_token = create_refresh_token(user.id, settings)
+    create_session_result = repo.create_session(
+        user_id=user.id,
+        session_key=str(uuid.uuid4()),
+        user_agent=request.headers.get("user-agent", "unknown"),
+    )
+    if inspect.isawaitable(create_session_result):
+        await create_session_result
+    await session.commit()
 
     return TokenResponse(
         access_token=access_token,
